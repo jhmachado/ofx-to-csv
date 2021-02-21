@@ -3,19 +3,19 @@
 class Ofx
 {
     /** @var string */
-    private $ofxFile;
+    private $filePath;
     
-    public function __construct($ofxFile)
+    public function __construct($filePath)
     {
-        $this->ofxFile = $ofxFile;
+        $this->filePath = $filePath;
     }
     
     /**
-     * Converte o arquivo OFX para XML
+     * Convert the OFX file to XML
      */
     public function getOfxAsXML()
     {
-        $content = file_get_contents($this->ofxFile);
+        $content = file_get_contents($this->filePath);
         $line = strpos($content, "<OFX>");
         $ofx = substr($content, $line - 1);
         $buffer = $ofx;
@@ -56,25 +56,28 @@ class Ofx
     }
     
     /**
-     * Retorna o Saldo da conta na data de exportação do extrato
+     * Returns the account balance at the file export date
      */
     public function getBalance()
     {    
         $xml = new SimpleXMLElement($this->getOfxAsXML());
         $balance = $xml->BANKMSGSRSV1->STMTTRNRS->STMTRS->LEDGERBAL->BALAMT;
-        $dateOfBalance = $xml->BANKMSGSRSV1->STMTTRNRS->STMTRS->LEDGERBAL->DTASOF;
-        $date = strtotime(substr($dateOfBalance, 0, 8));
+        $dateNode = $xml->BANKMSGSRSV1->STMTTRNRS->STMTRS->LEDGERBAL->DTASOF;
+        $date = strtotime(substr($dateNode, 0, 8));
         $dateToReturn = date('Y-m-d', $date);
         
-        return Array('date' => $dateToReturn, 'balance' => $balance);
+        return [
+            'date' => $dateToReturn,
+            'balance' => $balance
+        ];
     }
     
     /**
-     * Retora um array de objetos com as transações
-     *  DTPOSTED => Data da Transação 
-     *  TRNAMT   => Valor da Transação
-     *  TRNTYPE  => Tipo da Transação (Débito ou Crédito) 
-     *  MEMO     => Descrição da transação     
+     * Returns a list of objects with the transactions
+     *  DTPOSTED => Transaction date
+     *  TRNAMT   => Transaction amount
+     *  TRNTYPE  => Transaction Type (Debit or Credit) 
+     *  MEMO     => Description
      */
     public function getTransactions() {
         $xml = new SimpleXMLElement($this->getOfxAsXML());
