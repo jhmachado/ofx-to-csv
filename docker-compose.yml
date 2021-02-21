@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+    filereader:
+        image: jhmachado12/php:7.4-laravel
+        container_name: filereader
+        volumes:
+            - ./src:/app
+        ports:
+            - 80:80
+        entrypoint: bash

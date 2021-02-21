@@ -1,0 +1,9 @@
+{
+    "name": "jhmachado12/ojx",
+    "type": "project",
+    "description": "A simple tool to parse data from OFX files and send it to elastic search",
+    "license": "MIT",
+    "require": {
+        "php": "^7.2.5"
+    }
+}
